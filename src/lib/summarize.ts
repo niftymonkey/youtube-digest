@@ -17,6 +17,8 @@ function formatTimestamp(seconds: number): string {
  * Zod schema for structured digest output
  */
 const digestSchema = z.object({
+  summary: z.string().describe("A brief 2-3 sentence TL;DW (Too Long; Didn't Watch) summary capturing the essence of the video"),
+
   sections: z.array(
     z.object({
       title: z.string().describe("Descriptive heading for this content section"),
@@ -67,7 +69,10 @@ export async function generateDigest(
   // Extract all URLs from description and pinned comment
   const allUrls = combineUrls(metadata.description, metadata.pinnedComment);
 
-  const systemPrompt = `You are a content summarizer specializing in video transcripts. Your task is to create a structured summary with topic sections and categorized links.
+  const systemPrompt = `You are a content summarizer specializing in video transcripts. Your task is to create a structured summary with a TL;DW overview, topic sections, and categorized links.
+
+## TL;DW Summary
+Create a brief 2-3 sentence summary that captures the essence of the video. This should give readers a quick understanding of what the video is about without watching it.
 
 ## Content Sections
 Organize the video into logical topic-based sections. Each section should have:

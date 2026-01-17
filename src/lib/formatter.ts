@@ -69,8 +69,7 @@ export function formatMarkdown(
         .map((point) => `- ${point}`)
         .join("\n");
 
-      return `## ${section.title}
-**${section.timestampStart} - ${section.timestampEnd}**
+      return `### ${section.title} - **${section.timestampStart} - ${section.timestampEnd}**
 
 ${keyPoints}`;
     })
@@ -79,7 +78,7 @@ ${keyPoints}`;
   // Render related links
   let relatedLinksMarkdown = "";
   if (digest.relatedLinks.length > 0) {
-    relatedLinksMarkdown = `## Related Links
+    relatedLinksMarkdown = `### Related Links
 
 ${digest.relatedLinks.map((link) => `- **[${link.title}](${link.url})** - ${link.description}`).join("\n")}`;
   }
@@ -87,7 +86,7 @@ ${digest.relatedLinks.map((link) => `- **[${link.title}](${link.url})** - ${link
   // Render other links
   let otherLinksMarkdown = "";
   if (digest.otherLinks.length > 0) {
-    otherLinksMarkdown = `## Other Links
+    otherLinksMarkdown = `### Other Links
 
 ${digest.otherLinks.map((link) => `- **[${link.title}](${link.url})** - ${link.description}`).join("\n")}`;
   }
@@ -102,15 +101,17 @@ ${digest.otherLinks.map((link) => `- **[${link.title}](${link.url})** - ${link.d
 
 ---
 
+## At a Glance
+
+${digest.summary}
+
+## Content Sections
 ${sectionsMarkdown}
 
-${relatedLinksMarkdown ? `\n---\n\n${relatedLinksMarkdown}` : ""}
+## Links
+${relatedLinksMarkdown ? `\n${relatedLinksMarkdown}` : ""}
 
-${otherLinksMarkdown ? `\n---\n\n${otherLinksMarkdown}` : ""}
-
----
-
-*Generated with youtube-digest CLI + Claude Sonnet 4.5*
+${otherLinksMarkdown ? `\n${otherLinksMarkdown}` : ""}
 `;
 }
 

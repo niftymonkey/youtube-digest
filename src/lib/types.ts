@@ -35,6 +35,7 @@ export interface ContentSection {
 }
 
 export interface StructuredDigest {
+  summary: string;       // "At a Glance" overview of the video
   sections: ContentSection[];
   relatedLinks: Link[];  // Content-related links
   otherLinks: Link[];    // Social, sponsors, gear, etc.
