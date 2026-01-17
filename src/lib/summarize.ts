@@ -1,0 +1,135 @@
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { generateObject } from "ai";
+import { z } from "zod";
+import type { TranscriptEntry, VideoMetadata, StructuredDigest } from "./types.js";
+import { combineUrls } from "./url-extractor.js";
+
+/**
+ * Formats a timestamp in seconds to MM:SS format
+ */
+function formatTimestamp(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${minutes}:${secs.toString().padStart(2, "0")}`;
+}
+
+/**
+ * Zod schema for structured digest output
+ */
+const digestSchema = z.object({
+  sections: z.array(
+    z.object({
+      title: z.string().describe("Descriptive heading for this content section"),
+      timestampStart: z.string().describe("Start timestamp in MM:SS format (e.g., '0:00')"),
+      timestampEnd: z.string().describe("End timestamp in MM:SS format (e.g., '5:30')"),
+      keyPoints: z.array(z.string()).describe("2-4 key points or takeaways from this section"),
+    })
+  ).describe("Topic-based sections organizing the video content"),
+
+  relatedLinks: z.array(
+    z.object({
+      url: z.string().describe("The URL"),
+      title: z.string().describe("Short, concise title (2-5 words, e.g., 'Karpathy Tweet', 'RAMP AI Playbook')"),
+      description: z.string().describe("What this link is and why it's relevant to the video content"),
+    })
+  ).describe("Links related to video content: documentation, tools mentioned, related videos, resources"),
+
+  otherLinks: z.array(
+    z.object({
+      url: z.string().describe("The URL"),
+      title: z.string().describe("Short, concise title (2-5 words, e.g., 'Sponsor Link', 'Twitter Profile')"),
+      description: z.string().describe("What this link is (social media, sponsor, affiliate, etc.)"),
+    })
+  ).describe("Other links: social media, sponsors, affiliate links, creator's gear/setup"),
+});
+
+/**
+ * Generates a structured AI-powered digest of a video transcript using Claude
+ *
+ * @param transcript - Array of transcript entries with timestamps
+ * @param metadata - Video metadata including description and pinned comment
+ * @param apiKey - Anthropic API key
+ * @returns Structured digest with sections and categorized links
+ */
+export async function generateDigest(
+  transcript: TranscriptEntry[],
+  metadata: VideoMetadata,
+  apiKey: string
+): Promise<StructuredDigest> {
+  // Format transcript with timestamps
+  const formattedTranscript = transcript
+    .map((entry) => {
+      const timestamp = formatTimestamp(entry.offset);
+      return `[${timestamp}] ${entry.text}`;
+    })
+    .join("\n");
+
+  // Extract all URLs from description and pinned comment
+  const allUrls = combineUrls(metadata.description, metadata.pinnedComment);
+
+  const systemPrompt = `You are a content summarizer specializing in video transcripts. Your task is to create a structured summary with topic sections and categorized links.
+
+## Content Sections
+Organize the video into logical topic-based sections. Each section should have:
+- A descriptive heading that captures the topic
+- Start and end timestamps (in MM:SS format)
+- 2-4 concise bullet points with key takeaways
+
+Focus on main ideas and skip filler content (ums, ahs, tangents).
+
+## Link Categorization
+You will be provided with URLs found in the video description and comments. Categorize them into:
+
+**Related Links** - Links directly relevant to video content:
+- Documentation, tutorials, or resources mentioned in the video
+- Tools, libraries, or software discussed
+- Related videos or content references
+- Project repositories or code examples
+
+**Other Links** - Everything else:
+- Social media profiles (Twitter, Instagram, Discord, etc.)
+- Sponsor links and affiliate links
+- Creator's gear, equipment, or setup lists
+- General personal/business links
+- Patreon, membership, or donation links
+
+For each link, provide context about what it is and (for related links) why it's relevant to the video.`;
+
+  const userPrompt = `Video Title: ${metadata.title}
+Channel: ${metadata.channelTitle}
+
+Transcript:
+${formattedTranscript}
+
+${allUrls.length > 0 ? `\nURLs found in description/comments:\n${allUrls.join('\n')}` : ''}
+
+Please create a structured summary with content sections and categorized links.`;
+
+  try {
+    const anthropic = createAnthropic({ apiKey });
+    const model = anthropic("claude-sonnet-4-5");
+
+    const result = await generateObject({
+      model,
+      schema: digestSchema,
+      system: systemPrompt,
+      prompt: userPrompt,
+    });
+
+    return result.object;
+  } catch (error: any) {
+    if (error.message?.includes("401") || error.message?.includes("authentication")) {
+      throw new Error(
+        "Invalid Anthropic API key. Get a key at: https://console.anthropic.com/"
+      );
+    }
+
+    if (error.message?.includes("rate limit")) {
+      throw new Error(
+        "Anthropic API rate limit exceeded. Please wait and try again."
+      );
+    }
+
+    throw new Error(`Failed to generate digest: ${error.message || JSON.stringify(error)}`);
+  }
+}

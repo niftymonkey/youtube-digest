@@ -1,0 +1,33 @@
+{
+  "name": "youtube-digest",
+  "version": "0.1.0",
+  "description": "Generate AI-powered content summaries from YouTube videos with timestamps",
+  "type": "module",
+  "scripts": {
+    "digest": "tsx src/cli.ts"
+  },
+  "keywords": [
+    "youtube",
+    "transcript",
+    "ai",
+    "claude",
+    "summary",
+    "digest"
+  ],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.26.2",
+  "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.55",
+    "@googleapis/youtube": "^18.0.0",
+    "ai": "^5.0.112",
+    "dotenv": "^17.2.3",
+    "youtube-transcript-plus": "^1.1.2",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.26",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
