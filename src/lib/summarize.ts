@@ -1,5 +1,5 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { z } from "zod";
 import type { TranscriptEntry, VideoMetadata, StructuredDigest } from "./types.js";
 import { combineUrls } from "./url-extractor.js";
@@ -91,14 +91,14 @@ export async function generateDigest(
     const anthropic = createAnthropic({ apiKey });
     const model = anthropic("claude-sonnet-4-5");
 
-    const result = await generateObject({
+    const result = await generateText({
       model,
-      schema: digestSchema,
+      output: Output.object({ schema: digestSchema }),
       system: systemPrompt,
       prompt: userPrompt,
     });
 
-    return result.object;
+    return result.output as StructuredDigest;
   } catch (error: any) {
     if (error.message?.includes("401") || error.message?.includes("authentication")) {
       throw new Error(

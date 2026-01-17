@@ -103,7 +103,7 @@ export function formatMarkdown(
     })
     .join("\n");
   const sectionOverview = `| Section | Time |
-|---------|------|
+|---------|-----:|
 ${sectionRows}`;
 
   // Render content sections (with inline tangent references)

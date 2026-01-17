@@ -18,14 +18,17 @@
   "license": "MIT",
   "packageManager": "pnpm@10.26.2",
   "dependencies": {
-    "@ai-sdk/anthropic": "^2.0.55",
+    "@ai-sdk/anthropic": "^3.0.15",
     "@googleapis/youtube": "^18.0.0",
-    "ai": "^5.0.112",
+    "ai": "^6.0.39",
     "dotenv": "^17.2.3",
+    "marked": "^11.2.0",
+    "marked-terminal": "^6.2.0",
     "youtube-transcript-plus": "^1.1.2",
     "zod": "^4.3.5"
   },
   "devDependencies": {
+    "@types/marked-terminal": "^6.1.1",
     "@types/node": "^20.19.26",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"

@@ -1,5 +1,7 @@
 #!/usr/bin/env tsx
 import { config } from "dotenv";
+import { marked } from "marked";
+import { markedTerminal } from "marked-terminal";
 import {
   extractVideoId,
   fetchVideoMetadata,
@@ -8,6 +10,10 @@ import {
   formatMarkdown,
   saveDigest,
 } from "./lib/index.js";
+
+// Configure marked to use terminal renderer
+// @ts-expect-error - types are outdated but runtime works
+marked.use(markedTerminal());
 
 // Load environment variables
 config({ quiet: true });
@@ -96,9 +102,9 @@ async function main() {
     console.log(`💾 Saving to: ${outputPath}`);
     console.log("✅ File saved successfully\n");
 
-    // Step 6: Display to console
+    // Step 6: Display to console (rendered markdown)
     console.log("=".repeat(80));
-    console.log(markdown);
+    console.log(marked.parse(markdown));
     console.log("=".repeat(80));
 
     process.exit(0);
