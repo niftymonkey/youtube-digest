@@ -17,6 +17,7 @@ function isStale(digest: DbDigest): boolean {
 }
 
 function createEvent(step: Step, message: string, data?: unknown) {
+  console.log(`[DIGEST] Step: ${step} | Message: ${message}`);
   return `data: ${JSON.stringify({ step, message, data })}\n\n`;
 }
 
@@ -79,30 +80,41 @@ export async function POST(request: NextRequest) {
 
         // Step 1: Fetch metadata
         controller.enqueue(encoder.encode(createEvent("metadata", "Fetching video info...")));
+        console.log(`[DIGEST] Fetching metadata for videoId: ${videoId}`);
         const metadata = await fetchVideoMetadata(videoId, youtubeApiKey);
+        console.log(`[DIGEST] Metadata fetched successfully: ${metadata.title}`);
 
         // Step 2: Fetch transcript
         controller.enqueue(encoder.encode(createEvent("transcript", "Extracting transcript...")));
+        console.log(`[DIGEST] Starting transcript fetch for videoId: ${videoId}`);
         const transcript = await fetchTranscript(videoId);
+        console.log(`[DIGEST] Transcript fetched successfully: ${transcript.length} entries`);
 
         // Step 3: Generate digest
         controller.enqueue(encoder.encode(createEvent("analyzing", "Analyzing content...")));
+        console.log(`[DIGEST] Starting digest generation`);
         const digest = await generateDigest(transcript, metadata, anthropicApiKey);
+        console.log(`[DIGEST] Digest generated successfully`);
 
         // Step 4: Save or update digest
         controller.enqueue(encoder.encode(createEvent("saving", "Saving digest...")));
+        console.log(`[DIGEST] Saving to database, existingDigest: ${!!existingDigest}`);
         if (existingDigest) {
           // Update stale digest
           await updateDigest(videoId, metadata, digest);
+          console.log(`[DIGEST] Updated existing digest`);
         } else {
           // Save new digest
           await saveDigest(metadata, digest);
+          console.log(`[DIGEST] Saved new digest`);
         }
 
         // Complete
+        console.log(`[DIGEST] Process complete!`);
         controller.enqueue(encoder.encode(createEvent("complete", "Done!", { metadata, digest })));
         controller.close();
       } catch (error) {
+        console.error(`[DIGEST] ERROR:`, error);
         const message = error instanceof Error ? error.message : "Failed to create digest";
         controller.enqueue(encoder.encode(createEvent("error", message)));
         controller.close();
