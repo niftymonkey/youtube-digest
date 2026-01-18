@@ -256,3 +256,13 @@ export async function getDigests(options: {
   return { digests, total, hasMore: offset + digests.length < total };
 }
 
+/**
+ * Check if any digests exist
+ */
+export async function hasDigests(): Promise<boolean> {
+  const result = await sql<{ exists: boolean }>`
+    SELECT EXISTS(SELECT 1 FROM digests LIMIT 1) as exists
+  `;
+  return result.rows[0]?.exists ?? false;
+}
+

@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, ArrowLeft } from "lucide-react";
-import { Header } from "@/components/header";
 import { SectionAccordion } from "@/components/section-accordion";
 import { Timestamp } from "@/components/timestamp";
 import { getDigestById } from "@/lib/db";
@@ -85,9 +84,7 @@ export default async function DigestPage({ params }: PageProps) {
     : null;
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1 px-4 py-8">
+    <main className="flex-1 px-4 py-4">
         <article className="max-w-3xl mx-auto">
           {/* Back button */}
           <div className="mb-6">
@@ -127,7 +124,7 @@ export default async function DigestPage({ params }: PageProps) {
           </h1>
 
           {/* Meta line */}
-          <div className="flex flex-wrap items-center gap-2 text-[var(--color-text-secondary)] mb-8">
+          <div className="flex flex-wrap items-center gap-2 text-[var(--color-text-secondary)] mb-6">
             <span>{digest.channelName}</span>
             {digest.duration && (
               <>
@@ -144,7 +141,7 @@ export default async function DigestPage({ params }: PageProps) {
           </div>
 
           {/* At a Glance */}
-          <section className="mb-10">
+          <section className="mb-8">
             <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-3 pb-2 border-b border-[var(--color-border)]">
               At a Glance
             </h2>
@@ -154,7 +151,7 @@ export default async function DigestPage({ params }: PageProps) {
           </section>
 
           {/* Sections */}
-          <section className="mb-10">
+          <section className="mb-8">
             <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4 pb-2 border-b border-[var(--color-border)]">
               Sections
             </h2>
@@ -166,7 +163,7 @@ export default async function DigestPage({ params }: PageProps) {
 
           {/* Links & Resources */}
           {(digest.relatedLinks.length > 0 || digest.otherLinks.length > 0) && (
-            <section className="mb-10">
+            <section className="mb-8">
               <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4 pb-2 border-b border-[var(--color-border)]">
                 Links & Resources
               </h2>
@@ -231,7 +228,7 @@ export default async function DigestPage({ params }: PageProps) {
 
           {/* Tangents */}
           {digest.tangents && digest.tangents.length > 0 && (
-            <section className="mb-10">
+            <section className="mb-8">
               <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4 pb-2 border-b border-[var(--color-border)]">
                 Tangents
               </h2>
@@ -265,8 +262,7 @@ export default async function DigestPage({ params }: PageProps) {
               </ul>
             </section>
           )}
-        </article>
-      </main>
-    </div>
+      </article>
+    </main>
   );
 }
