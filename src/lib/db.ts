@@ -284,3 +284,13 @@ export async function hasDigests(): Promise<boolean> {
   return result.rows[0]?.exists ?? false;
 }
 
+/**
+ * Delete a digest by ID
+ */
+export async function deleteDigest(id: string): Promise<boolean> {
+  const result = await sql`
+    DELETE FROM digests WHERE id = ${id}
+  `;
+  return (result.rowCount ?? 0) > 0;
+}
+

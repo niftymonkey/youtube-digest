@@ -104,19 +104,22 @@ export async function POST(request: NextRequest) {
         // Step 4: Save or update digest
         controller.enqueue(encoder.encode(createEvent("saving", "Saving digest...")));
         console.log(`[DIGEST] Saving to database, existingDigest: ${!!existingDigest}`);
+        let digestId: string;
         if (existingDigest) {
           // Update stale digest
-          await updateDigest(videoId, metadata, digest);
+          const updated = await updateDigest(videoId, metadata, digest);
+          digestId = updated.id;
           console.log(`[DIGEST] Updated existing digest`);
         } else {
           // Save new digest
-          await saveDigest(metadata, digest);
+          const saved = await saveDigest(metadata, digest);
+          digestId = saved.id;
           console.log(`[DIGEST] Saved new digest`);
         }
 
         // Complete
         console.log(`[DIGEST] Process complete!`);
-        controller.enqueue(encoder.encode(createEvent("complete", "Done!", { metadata, digest })));
+        controller.enqueue(encoder.encode(createEvent("complete", "Done!", { metadata, digest, digestId })));
         controller.close();
       } catch (error) {
         console.error(`[DIGEST] ERROR:`, error);

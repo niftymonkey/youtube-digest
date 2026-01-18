@@ -25,7 +25,12 @@ const digestSchema = z.object({
       title: z.string().describe("Descriptive heading for this content section"),
       timestampStart: z.string().describe("Start timestamp in MM:SS format (e.g., '0:00')"),
       timestampEnd: z.string().describe("End timestamp in MM:SS format (e.g., '5:30')"),
-      keyPoints: z.array(z.string()).describe("2-4 synthesized takeaways that consolidate related points into meaningful insights"),
+      keyPoints: z.array(
+        z.object({
+          text: z.string().describe("The synthesized takeaway or insight"),
+          timestamp: z.string().describe("Approximate timestamp when this point is discussed (MM:SS format)"),
+        })
+      ).describe("2-5 synthesized takeaways with timestamps, consolidating related points into meaningful insights"),
     })
   ).describe("Broad topic sections (aim for 4-8) organizing the video content"),
 
