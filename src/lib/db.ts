@@ -85,6 +85,8 @@ export async function saveDigest(
       tangents,
       related_links as "relatedLinks",
       other_links as "otherLinks",
+      is_shared as "isShared",
+      slug,
       created_at as "createdAt",
       updated_at as "updatedAt"
     `;
@@ -139,6 +141,8 @@ export async function updateDigest(
       tangents,
       related_links as "relatedLinks",
       other_links as "otherLinks",
+      is_shared as "isShared",
+      slug,
       created_at as "createdAt",
       updated_at as "updatedAt"
   `;
@@ -170,6 +174,8 @@ export async function getDigestById(
         tangents,
         related_links as "relatedLinks",
         other_links as "otherLinks",
+        is_shared as "isShared",
+        slug,
         created_at as "createdAt",
         updated_at as "updatedAt"
       FROM digests
@@ -194,6 +200,8 @@ export async function getDigestById(
       tangents,
       related_links as "relatedLinks",
       other_links as "otherLinks",
+      is_shared as "isShared",
+      slug,
       created_at as "createdAt",
       updated_at as "updatedAt"
     FROM digests
@@ -230,6 +238,8 @@ export async function getDigestByVideoId(
         tangents,
         related_links as "relatedLinks",
         other_links as "otherLinks",
+        is_shared as "isShared",
+        slug,
         created_at as "createdAt",
         updated_at as "updatedAt"
       FROM digests
@@ -273,6 +283,8 @@ export async function findGlobalDigestByVideoId(
         tangents,
         related_links as "relatedLinks",
         other_links as "otherLinks",
+        is_shared as "isShared",
+        slug,
         created_at as "createdAt",
         updated_at as "updatedAt"
       FROM digests
@@ -345,6 +357,8 @@ export async function copyDigestForUser(
       tangents,
       related_links as "relatedLinks",
       other_links as "otherLinks",
+      is_shared as "isShared",
+      slug,
       created_at as "createdAt",
       updated_at as "updatedAt"
     `;
@@ -442,5 +456,93 @@ export async function deleteDigest(userId: string, id: string): Promise<boolean>
     DELETE FROM digests WHERE id = ${id} AND user_id = ${userId}
   `;
   return (result.rowCount ?? 0) > 0;
+}
+
+/**
+ * Get a shared digest by its slug (public access, no auth required)
+ */
+export async function getSharedDigestBySlug(
+  slug: string
+): Promise<DbDigest | null> {
+  const result = await sql<DbDigest>`
+    SELECT
+      id,
+      user_id as "userId",
+      video_id as "videoId",
+      title,
+      channel_name as "channelName",
+      channel_slug as "channelSlug",
+      duration,
+      published_at as "publishedAt",
+      thumbnail_url as "thumbnailUrl",
+      summary,
+      sections,
+      tangents,
+      related_links as "relatedLinks",
+      other_links as "otherLinks",
+      is_shared as "isShared",
+      slug,
+      created_at as "createdAt",
+      updated_at as "updatedAt"
+    FROM digests
+    WHERE slug = ${slug} AND is_shared = TRUE
+  `;
+
+  return result.rows[0] || null;
+}
+
+/**
+ * Toggle sharing state for a digest
+ * When enabling, generates a unique slug from the title
+ * When disabling, keeps the slug (in case user re-enables later)
+ */
+export async function toggleDigestSharing(
+  userId: string,
+  digestId: string,
+  isShared: boolean,
+  title?: string
+): Promise<{ isShared: boolean; slug: string | null } | null> {
+  // If enabling sharing, we may need to generate a slug
+  // Use a single query with COALESCE to only generate slug if it doesn't exist
+  if (isShared && title) {
+    const baseSlug = createSlug(title);
+    // Try to update with the base slug, falling back to existing slug if already set
+    // The unique constraint will catch collisions
+    const result = await sql<{ is_shared: boolean; slug: string | null }>`
+      UPDATE digests
+      SET
+        is_shared = ${isShared},
+        slug = COALESCE(slug, ${baseSlug}),
+        updated_at = NOW()
+      WHERE id = ${digestId} AND user_id = ${userId}
+      RETURNING is_shared, slug
+    `;
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return {
+      isShared: result.rows[0].is_shared,
+      slug: result.rows[0].slug,
+    };
+  }
+
+  // Simple toggle (disabling, or re-enabling with existing slug)
+  const result = await sql<{ is_shared: boolean; slug: string | null }>`
+    UPDATE digests
+    SET is_shared = ${isShared}, updated_at = NOW()
+    WHERE id = ${digestId} AND user_id = ${userId}
+    RETURNING is_shared, slug
+  `;
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  return {
+    isShared: result.rows[0].is_shared,
+    slug: result.rows[0].slug,
+  };
 }
 

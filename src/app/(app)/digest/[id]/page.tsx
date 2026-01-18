@@ -8,6 +8,7 @@ import { SectionAccordion } from "@/components/section-accordion";
 import { Timestamp } from "@/components/timestamp";
 import { DeleteDigestButton } from "@/components/delete-digest-button";
 import { RegenerateDigestButton } from "@/components/regenerate-digest-button";
+import { ShareButton } from "@/components/share-button";
 import { getDigestById } from "@/lib/db";
 
 interface PageProps {
@@ -105,6 +106,7 @@ export default async function DigestPage({ params }: PageProps) {
               All digests
             </Link>
             <div className="flex items-center gap-3">
+              <ShareButton digestId={id} isShared={digest.isShared} slug={digest.slug} title={digest.title} />
               <RegenerateDigestButton digestId={id} videoId={digest.videoId} />
               <DeleteDigestButton digestId={id} />
             </div>
