@@ -76,6 +76,8 @@ export interface DbDigest {
   tangents: Tangent[] | null;
   relatedLinks: Link[];
   otherLinks: Link[];
+  isShared: boolean;
+  slug: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
