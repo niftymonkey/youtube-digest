@@ -27,11 +27,16 @@ export interface Link {
   description: string; // What the link is and why it's relevant
 }
 
+export interface KeyPoint {
+  text: string;
+  timestamp: string;  // Approximate timestamp when this point is discussed (MM:SS format)
+}
+
 export interface ContentSection {
   title: string;
   timestampStart: string;  // e.g., "0:00"
   timestampEnd: string;    // e.g., "5:30"
-  keyPoints: string[];
+  keyPoints: KeyPoint[] | string[];  // KeyPoint[] for new digests, string[] for legacy
 }
 
 export interface Tangent {

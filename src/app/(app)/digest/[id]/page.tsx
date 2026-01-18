@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ExternalLink, ArrowLeft } from "lucide-react";
 import { SectionAccordion } from "@/components/section-accordion";
 import { Timestamp } from "@/components/timestamp";
+import { DeleteDigestButton } from "@/components/delete-digest-button";
+import { RegenerateDigestButton } from "@/components/regenerate-digest-button";
 import { getDigestById } from "@/lib/db";
 
 interface PageProps {
@@ -86,8 +88,8 @@ export default async function DigestPage({ params }: PageProps) {
   return (
     <main className="flex-1 px-4 py-4">
         <article className="max-w-3xl mx-auto">
-          {/* Back button */}
-          <div className="mb-6">
+          {/* Back button and actions */}
+          <div className="mb-6 flex items-center justify-between">
             <Link
               href="/digests"
               className="inline-flex items-center gap-1 text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors text-sm"
@@ -95,6 +97,10 @@ export default async function DigestPage({ params }: PageProps) {
               <ArrowLeft className="w-4 h-4" />
               All digests
             </Link>
+            <div className="flex items-center gap-3">
+              <RegenerateDigestButton digestId={id} videoId={digest.videoId} />
+              <DeleteDigestButton digestId={id} />
+            </div>
           </div>
 
           {/* Thumbnail */}
@@ -158,6 +164,7 @@ export default async function DigestPage({ params }: PageProps) {
             <SectionAccordion
               sections={digest.sections}
               videoId={digest.videoId}
+              tangents={digest.tangents ?? undefined}
             />
           </section>
 
@@ -236,7 +243,8 @@ export default async function DigestPage({ params }: PageProps) {
                 {digest.tangents.map((tangent, index) => (
                   <li
                     key={index}
-                    className="p-4 rounded-xl bg-[var(--color-bg-secondary)] border border-[var(--color-border)]"
+                    id={`tangent-${index}`}
+                    className="p-4 rounded-xl bg-[var(--color-bg-secondary)] border border-[var(--color-border)] scroll-mt-20"
                   >
                     <div className="flex items-start justify-between gap-4 mb-2">
                       <span className="font-medium text-[var(--color-text-primary)]">

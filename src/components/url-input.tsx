@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { VideoMetadata, StructuredDigest } from "@/lib/types";
 
 interface UrlInputProps {
-  onDigestComplete: (data: { metadata: VideoMetadata; digest: StructuredDigest }) => void;
+  onDigestComplete: (digestId: string) => void;
 }
 
 type Step = "metadata" | "transcript" | "analyzing" | "saving" | "complete" | "error";
@@ -86,9 +85,9 @@ export function UrlInput({ onDigestComplete }: UrlInputProps) {
               throw new Error(data.message);
             }
 
-            if (data.step === "complete" && data.data) {
-              console.log(`[DIGEST CLIENT] Complete! Data:`, data.data);
-              onDigestComplete(data.data);
+            if (data.step === "complete" && data.data?.digestId) {
+              console.log(`[DIGEST CLIENT] Complete! DigestId:`, data.data.digestId);
+              onDigestComplete(data.data.digestId);
             }
           }
         }
