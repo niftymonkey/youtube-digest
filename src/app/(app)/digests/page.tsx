@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { Header } from "@/components/header";
 import { DigestCard } from "@/components/digest-card";
 import { DigestSearch } from "@/components/digest-search";
 import { getDigests } from "@/lib/db";
@@ -22,7 +21,7 @@ async function DigestGrid({ search }: { search?: string }) {
         </p>
         {!search && (
           <Link
-            href="/"
+            href="/home"
             className="mt-4 inline-block text-[var(--color-accent)] hover:underline"
           >
             Create your first digest
@@ -63,42 +62,39 @@ export default async function DigestsPage({ searchParams }: PageProps) {
   const { total } = await getDigests({ limit: 1 });
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1 px-4 py-8">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">
-                Your Digests
-              </h1>
-              <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                {total} {total === 1 ? "digest" : "digests"} saved
-              </p>
-            </div>
-            <Link
-              href="/"
-              className={cn(
-                "inline-flex items-center gap-2 px-4 py-2 rounded-lg",
-                "bg-[var(--color-accent)] text-white",
-                "hover:bg-[var(--color-accent-hover)] transition-colors"
-              )}
-            >
-              <Plus className="w-4 h-4" />
-              New
-            </Link>
+    <main className="flex-1 px-4 py-8">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">
+              Your Digests
+            </h1>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+              {total} {total === 1 ? "digest" : "digests"} saved
+            </p>
           </div>
-
-          {/* Search */}
-          <DigestSearch initialValue={search} />
-
-          {/* Content */}
-          <Suspense key={search} fallback={<DigestGridSkeleton />}>
-            <DigestGrid search={search} />
-          </Suspense>
+          <Link
+            href="/home"
+            className={cn(
+              "inline-flex items-center gap-2 px-4 py-2 rounded-lg",
+              "bg-[var(--color-accent)] text-white",
+              "hover:bg-[var(--color-accent-hover)] transition-colors"
+            )}
+          >
+            <Plus className="w-4 h-4" />
+            New
+          </Link>
         </div>
-      </main>
-    </div>
+
+        {/* Search */}
+        <DigestSearch initialValue={search} />
+
+        {/* Content */}
+        <Suspense key={search} fallback={<DigestGridSkeleton />}>
+          <DigestGrid search={search} />
+        </Suspense>
+      </div>
+    </main>
   );
 }
