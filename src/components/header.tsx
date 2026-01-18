@@ -21,6 +21,12 @@ export async function Header() {
         </Link>
 
         <div className="flex items-center gap-4">
+          <Link
+            href="/digests"
+            className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+          >
+            Browse
+          </Link>
           {user && (
             <UserMenu
               user={{
