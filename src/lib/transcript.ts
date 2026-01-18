@@ -1,8 +1,12 @@
-import { fetchTranscript as fetchYouTubeTranscript } from "youtube-transcript-plus";
+import { Supadata } from "@supadata/js";
 import type { TranscriptEntry } from "./types";
 
+const supadata = new Supadata({
+  apiKey: process.env.SUPADATA_API_KEY!,
+});
+
 /**
- * Fetches the transcript for a YouTube video
+ * Fetches the transcript for a YouTube video using Supadata API
  *
  * @param videoId - YouTube video ID
  * @returns Array of transcript entries with timestamps
@@ -15,22 +19,39 @@ export async function fetchTranscript(
   console.log(`[TRANSCRIPT] Starting fetch for videoId: ${videoId}`);
 
   try {
-    const rawTranscript = await fetchYouTubeTranscript(videoId);
-    console.log(`[TRANSCRIPT] Success in ${Date.now() - startTime}ms, entries: ${rawTranscript.length}`);
+    const result = await supadata.youtube.transcript({
+      videoId,
+    });
+
+    // Handle async job case (unlikely for YouTube but SDK supports it)
+    if ("jobId" in result) {
+      throw new Error("Transcript generation queued - not supported yet");
+    }
+
+    // Handle case where content is a string (no timestamps)
+    if (typeof result.content === "string") {
+      throw new Error(
+        "Transcript returned without timestamps - cannot process"
+      );
+    }
+
+    console.log(
+      `[TRANSCRIPT] Success in ${Date.now() - startTime}ms, entries: ${result.content.length}`
+    );
 
     // Convert to our TranscriptEntry format
-    return rawTranscript.map((entry) => ({
+    // Supadata returns offset/duration in milliseconds, we need seconds
+    return result.content.map((entry) => ({
       text: entry.text,
-      offset: entry.offset, // youtube-transcript-plus returns offset in seconds
-      duration: entry.duration, // duration in seconds
-      lang: entry.lang,
+      offset: entry.offset / 1000,
+      duration: entry.duration / 1000,
+      lang: result.lang,
     }));
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`[TRANSCRIPT] Failed in ${Date.now() - startTime}ms:`, error);
-    console.error(`[TRANSCRIPT] Error name: ${error.name}, message: ${error.message}`);
-    console.error(`[TRANSCRIPT] Error stack:`, error.stack);
 
-    const errorMsg = error.message?.toLowerCase() || "";
+    const errorMsg =
+      error instanceof Error ? error.message?.toLowerCase() : "";
 
     if (errorMsg.includes("disabled") || errorMsg.includes("not available")) {
       throw new Error(
@@ -46,6 +67,7 @@ export async function fetchTranscript(
       throw new Error("Invalid video ID");
     }
 
-    throw new Error(`Failed to fetch transcript: ${error.message}`);
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to fetch transcript: ${message}`);
   }
 }
