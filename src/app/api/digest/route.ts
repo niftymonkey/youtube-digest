@@ -55,11 +55,7 @@ export async function POST(request: NextRequest) {
 
         // Step 4: Save to database
         controller.enqueue(encoder.encode(createEvent("saving", "Saving digest...")));
-        try {
-          await saveDigest(metadata, digest);
-        } catch (dbError) {
-          console.error("Failed to save digest:", dbError);
-        }
+        await saveDigest(metadata, digest);
 
         // Complete
         controller.enqueue(encoder.encode(createEvent("complete", "Done!", { metadata, digest })));
