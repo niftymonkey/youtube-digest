@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Share2, Check, Copy, Link2, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ShareButtonProps {
   digestId: string;
@@ -81,19 +82,21 @@ export function ShareButton({ digestId, isShared: initialIsShared, slug: initial
 
   return (
     <div className="relative flex items-center">
-      <button
+      <Button
         ref={buttonRef}
         onClick={handleButtonClick}
         disabled={isUpdating}
-        className="inline-flex items-center gap-1 text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] transition-colors text-sm disabled:opacity-50"
+        variant="outline"
+        size="icon-sm"
+        className={isShared ? "text-[var(--color-accent)] border-[var(--color-accent)]/50 hover:bg-[var(--color-bg-tertiary)]" : "text-[var(--color-text-secondary)] border-[var(--color-border)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]/50 hover:bg-[var(--color-bg-tertiary)]"}
         title={isShared ? "Manage sharing" : "Share digest"}
       >
         {isUpdating ? (
           <Loader2 className="w-4 h-4 animate-spin" />
         ) : (
-          <Share2 className={`w-4 h-4 ${isShared ? "text-[var(--color-accent)]" : ""}`} />
+          <Share2 className="w-4 h-4" />
         )}
-      </button>
+      </Button>
 
       {showPopover && isShared && (
         <div

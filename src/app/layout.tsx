@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
 import { AuthKitProvider } from "@workos-inc/authkit-nextjs/components";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ThemeProvider } from "@/components/theme-provider";
+import "@fontsource-variable/plus-jakarta-sans";
+import "@fontsource-variable/source-sans-3";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/500.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,7 +28,6 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <body className="antialiased min-h-screen bg-[var(--color-bg-primary)]">
         <AuthKitProvider>
