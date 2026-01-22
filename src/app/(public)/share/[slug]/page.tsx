@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Youtube } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ChapterGrid } from "@/components/chapter-grid";
 import { Card, CardContent } from "@/components/ui/card";
 import { getSharedDigestBySlug } from "@/lib/db";
@@ -209,15 +209,12 @@ export default async function SharedDigestPage({ params }: PageProps) {
 
         {/* CTA */}
         <section className="mt-6 py-6 px-4 rounded-xl bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Youtube className="w-6 h-6 text-[var(--color-accent)]" />
-            <span className="font-semibold text-lg text-[var(--color-text-primary)]">YouTube Digest</span>
-          </div>
-          <p className="text-[var(--color-text-secondary)] text-base mb-4">
-            Create your own AI-powered video digests
+          <p className="text-[var(--color-text-secondary)] mb-4">
+            Create your own digests with AI summaries, timestamps, and more.
           </p>
           <Link
-            href="/"
+            href="/auth"
+            prefetch={false}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-base font-medium bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-colors cursor-pointer"
           >
             Get Started

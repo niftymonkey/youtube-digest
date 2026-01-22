@@ -7,6 +7,7 @@ import { LandingHeader } from "@/components/landing-header";
 import { DigestCard } from "@/components/digest-card";
 import { DigestSearch } from "@/components/digest-search";
 import { NewDigestDialog } from "@/components/new-digest-dialog";
+import { AccessRestricted } from "@/components/access-restricted";
 import { getDigests } from "@/lib/db";
 import { isEmailAllowed } from "@/lib/access";
 import { cn } from "@/lib/utils";
@@ -62,6 +63,11 @@ async function DigestGrid({ userId, search, hasAccess }: { userId: string; searc
   const { digests } = await getDigests({ userId, search, limit: 50 });
 
   if (digests.length === 0) {
+    // Show AccessRestricted for non-allowed users with no digests (and no active search)
+    if (!hasAccess && !search) {
+      return <AccessRestricted />;
+    }
+
     return (
       <div className="text-center py-12">
         <p className="text-[var(--color-text-secondary)]">
