@@ -11,7 +11,6 @@ import {
   LibraryShell,
   DigestGrid,
   DigestGridSkeleton,
-  CompactModeSearch,
 } from "@/components/library-content";
 import { getDigests } from "@/lib/db";
 import { isEmailAllowed } from "@/lib/access";
@@ -126,8 +125,6 @@ async function AuthenticatedDashboard({ search }: { search?: string }) {
             {total} {total === 1 ? "digest" : "digests"} saved
           </span>
         </div>
-
-        <CompactModeSearch />
 
         <Suspense key={search} fallback={<DigestGridSkeleton />}>
           <DigestGridContent

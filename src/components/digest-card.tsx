@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { DigestSummary } from "@/lib/types";
 import { TagBadge } from "@/components/tag-badge";
@@ -22,12 +21,11 @@ export function DigestCard({ digest }: DigestCardProps) {
       {/* Thumbnail */}
       <div className="aspect-video rounded-lg bg-[var(--color-bg-tertiary)] mb-3 overflow-hidden relative">
         {digest.thumbnailUrl ? (
-          <Image
+          <img
             src={digest.thumbnailUrl}
             alt={digest.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-[var(--color-text-tertiary)]">
