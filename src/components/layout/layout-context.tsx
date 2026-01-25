@@ -12,16 +12,12 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useSidebarEnabled } from "@/hooks/use-sidebar-enabled";
 
-export type LayoutMode = "compact" | "expanded";
-
 // Sidebar width constraints (in pixels)
 export const SIDEBAR_MIN_WIDTH = 200;
 export const SIDEBAR_MAX_WIDTH = 400;
 export const SIDEBAR_DEFAULT_WIDTH = 256;
 
 interface LayoutContextValue {
-  mode: LayoutMode;
-  setMode: (mode: LayoutMode) => void;
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
@@ -33,24 +29,17 @@ interface LayoutContextValue {
 
 const LayoutContext = createContext<LayoutContextValue | null>(null);
 
-const STORAGE_KEY = "youtube-digest-layout-mode";
 const SIDEBAR_WIDTH_KEY = "youtube-digest-sidebar-width";
 
 export function LayoutProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<LayoutMode>("compact");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarWidth, setSidebarWidthState] = useState(SIDEBAR_DEFAULT_WIDTH);
   const [mounted, setMounted] = useState(false);
   const isMobile = !useMediaQuery("(min-width: 768px)");
 
-  // Load mode and sidebar width from localStorage on mount
+  // Load sidebar width from localStorage on mount
   useEffect(() => {
     try {
-      const storedMode = localStorage.getItem(STORAGE_KEY);
-      if (storedMode === "compact" || storedMode === "expanded") {
-        setModeState(storedMode);
-      }
-
       const storedWidth = localStorage.getItem(SIDEBAR_WIDTH_KEY);
       if (storedWidth) {
         const width = parseInt(storedWidth, 10);
@@ -63,15 +52,6 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
     }
 
     setMounted(true);
-  }, []);
-
-  const setMode = useCallback((newMode: LayoutMode) => {
-    setModeState(newMode);
-    try {
-      localStorage.setItem(STORAGE_KEY, newMode);
-    } catch {
-      // localStorage unavailable
-    }
   }, []);
 
   const toggleSidebar = useCallback(() => {
@@ -91,8 +71,6 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   return (
     <LayoutContext.Provider
       value={{
-        mode,
-        setMode,
         sidebarOpen,
         setSidebarOpen,
         toggleSidebar,
