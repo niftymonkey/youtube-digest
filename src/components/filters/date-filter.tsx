@@ -46,13 +46,6 @@ export function DateFilter() {
     setDateTo(to);
   };
 
-  const setThisYear = () => {
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    setDateFrom(startOfYear);
-    setDateTo(now);
-  };
-
   // Format date for display
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("en-US", {
@@ -120,12 +113,6 @@ export function DateFilter() {
             className="px-2 py-1 text-xs rounded bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] transition-colors"
           >
             Last 30 days
-          </button>
-          <button
-            onClick={setThisYear}
-            className="px-2 py-1 text-xs rounded bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] transition-colors"
-          >
-            This year
           </button>
         </div>
 

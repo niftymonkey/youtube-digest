@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-type PresetKey = "24h" | "2d" | "3d" | "7d" | "30d" | "year";
+type PresetKey = "24h" | "2d" | "3d" | "7d" | "30d";
 
 interface Preset {
   key: PresetKey;
@@ -66,15 +66,6 @@ const presets: Preset[] = [
       const to = new Date();
       const from = new Date();
       from.setDate(from.getDate() - 30);
-      return { from, to };
-    },
-  },
-  {
-    key: "year",
-    label: "Year",
-    getRange: () => {
-      const to = new Date();
-      const from = new Date(to.getFullYear(), 0, 1);
       return { from, to };
     },
   },
