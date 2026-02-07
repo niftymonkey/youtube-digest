@@ -35,7 +35,7 @@ export function FilteredDigestGrid({ digests, hasAccess }: FilteredDigestGridPro
     }
     if (dateTo) {
       const endOfDay = new Date(dateTo);
-      endOfDay.setHours(23, 59, 59, 999);
+      endOfDay.setUTCHours(23, 59, 59, 999);
       if (createdAt > endOfDay) {
         return false;
       }

@@ -75,7 +75,7 @@ async function DigestGridContent({
 }) {
   // Server only filters by search (full-text search needs the DB)
   // Tags and dates are filtered client-side for instant UX
-  const { digests } = await getDigests({ userId, search, limit: 50 });
+  const { digests } = await getDigests({ userId, search, limit: 500 });
 
   if (digests.length === 0 && !search) {
     if (!hasAccess) {
@@ -88,6 +88,16 @@ async function DigestGridContent({
         <div className="mt-4">
           <NewDigestDialog variant="outline" />
         </div>
+      </div>
+    );
+  }
+
+  if (digests.length === 0 && search) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-[var(--color-text-secondary)]">
+          No digests match your search
+        </p>
       </div>
     );
   }
