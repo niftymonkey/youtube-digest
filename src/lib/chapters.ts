@@ -43,11 +43,23 @@ export function extractChapters(
 
   // Deduplicate by start time (keep first occurrence)
   const seen = new Set<number>();
-  const uniqueChapters = parsedChapters.filter((chapter) => {
+  const exactDeduped = parsedChapters.filter((chapter) => {
     if (seen.has(chapter.start)) return false;
     seen.add(chapter.start);
     return true;
   });
+
+  // Proximity dedup: descriptions often list timestamps twice (TOC + detailed notes)
+  // with slight variations (e.g., 2:30 vs 2:31). Collapse chapters starting within
+  // 2 seconds of an already-accepted chapter.
+  const uniqueChapters = exactDeduped.reduce<typeof exactDeduped>((accepted, chapter) => {
+    if (accepted.length === 0) return [chapter];
+    const tooClose = accepted.some(
+      (prev) => Math.abs(prev.start - chapter.start) <= 2
+    );
+    if (!tooClose) accepted.push(chapter);
+    return accepted;
+  }, []);
 
   // YouTube requires minimum 3 chapters, first must start at 0:00
   if (uniqueChapters.length < 3) return null;

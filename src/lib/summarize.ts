@@ -219,8 +219,17 @@ export async function generateDigest(
 
     const digest = result.output as StructuredDigest;
 
+    // Deduplicate sections with the same title (LLM can occasionally produce duplicates)
+    const seenTitles = new Set<string>();
+    const dedupedSections = digest.sections.filter((section) => {
+      const key = section.title.toLowerCase().trim();
+      if (seenTitles.has(key)) return false;
+      seenTitles.add(key);
+      return true;
+    });
+
     // Post-process: merge tangent-only chapters (auto-generated chapters only)
-    const processedSections = mergeTangentOnlyChapters(digest.sections, !!hasChapters);
+    const processedSections = mergeTangentOnlyChapters(dedupedSections, !!hasChapters);
 
     // Sort sections and key points chronologically
     return sortDigestChronologically({
